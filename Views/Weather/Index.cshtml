@@ -1,0 +1,102 @@
+﻿@{
+    ViewData["Title"] = "Weather Field Dashboard";
+
+    // Retrieve the backend objects passed from our controller safely
+    var current = ViewBag.Current as Weather.Models.API.CurrentWeatherResponse;
+    var forecast = ViewBag.Forecast as Weather.Models.API.ForecastWeatherResponse;
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center mb-4">
+        <div class="col-md-6">
+            <div class="card shadow-sm p-4">
+                <h3 class="text-center mb-3">Field Weather Dashboard</h3>
+
+                <form action="/Weather/Search" method="get" class="d-flex gap-2">
+                    <input type="text"
+                           name="city"
+                           class="form-control form-control-lg"
+                           placeholder="Enter city name (e.g., Durban)..."
+                           value="@ViewBag.SearchedCity"
+                           required />
+                    <button type="submit" class="btn btn-primary btn-lg px-4">Search</button>
+                </form>
+
+                @if (ViewBag.ErrorMessage != null)
+                {
+                    <div class="alert alert-danger mt-3 mb-0" role="alert">
+                        @ViewBag.ErrorMessage
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    @if (current != null && forecast != null)
+    {
+        string currentIconUrl = $"https://openweathermap.org/img/wn/{current.Weather[0].IconCode}@2x.png";
+
+        <div class="card text-dark mb-4 border-0 shadow" style="background-color: #e0f2fe; transition: background 0.3s ease;">
+            <div class="card-body p-4">
+
+                <div class="row align-items-center">
+                    <div class="col-md-6">
+                        <h1 class="display-4 fw-bold">@current.CityName</h1>
+                        <h5 class="text-muted">Country: @current.Sys.Country</h5>
+                        <p class="text-capitalize lead mb-0">Condition: @current.Weather[0].Description</p>
+                    </div>
+
+                    <div class="col-md-6 text-md-end mt-3 mt-md-0">
+                        <img src="@currentIconUrl"
+                             alt="@current.Weather[0].Description"
+                             style="width: 100px; height: 100px;" />
+
+                        <div class="display-3 fw-bold">@Math.Round(current.Main.Temperature)°C</div>
+                        <p class="text-muted small">Feels like: @Math.Round(current.Main.FeelsLike)°C</p>
+                    </div>
+                </div>
+
+                <hr />
+
+                <div class="row text-center bg-white bg-opacity-50 rounded py-3 mx-1">
+                    <div class="col-6 col-md-3 border-end">
+                        <div class="text-muted small fw-bold">HUMIDITY</div>
+                        <div class="fs-4 fw-semibold">@current.Main.Humidity%</div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="text-muted small fw-bold">WIND SPEED</div>
+                        <div class="fs-4 fw-semibold">@current.Wind.Speed m/s</div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <h4 class="mb-3 fw-semibold">Upcoming 5-Day Extended Shift Forecast</h4>
+
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-4 row-cols-lg-5 g-3">
+            @foreach (var item in forecast.ForecastList.Take(5)) // Showing the first 5 intervals as placeholders
+            {
+                string forecastIconUrl = $"https://openweathermap.org/img/wn/{item.Weather[0].IconCode}.png";
+
+                <div class="col">
+                    <div class="card h-100 shadow-sm border-0 text-center p-3">
+                        <div class="text-muted small fw-bold">@item.DateTimeText.Substring(5, 11)</div>
+
+                        <div class="my-2">
+                            <img src="@forecastIconUrl"
+                                 alt="@item.Weather[0].Description" />
+                        </div>
+
+                        <div class="fs-4 fw-bold">@Math.Round(item.Main.Temperature)°C</div>
+                        <div class="text-muted text-capitalize x-small">@item.Weather[0].Description</div>
+
+                        <div class="mt-2 pt-2 border-top text-muted small">
+                            Humidity: @item.Main.Humidity%
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>
