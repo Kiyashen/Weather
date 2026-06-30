@@ -194,7 +194,7 @@ namespace Weather.Controllers
             // 2. If a city search is currently active, load its data directly from the IMemoryCache layers.
             // 3. Execute conversion mathematical formulas purely on the backend server engine to convert values WITHOUT re-pinging the OpenWeatherMap API endpoints.
 
-            // Save the new unit preference
+            // Save the new Unit Preference
             string newUnit = string.IsNullOrEmpty(unit) ? "Fahrenheit" : unit;
             HttpContext.Session.SetString(TEMP_UNIT_KEY, newUnit);
 
